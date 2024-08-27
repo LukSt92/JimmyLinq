@@ -6,33 +6,34 @@ using System.Threading.Tasks;
 
 namespace JimmyLinq
 {
-    static class ComicAnalyzer
+    public static class ComicAnalyzer
     {
-        private static PriceRange CalculatePriceRange(Comic comic)
+        private static PriceRange CalculatePriceRange(Comic comic, IReadOnlyDictionary<int, decimal> prices)
         {
-            if (Comic.Prices[comic.Issue] > 100)
+            if (prices[comic.Issue] > 100)
                 return PriceRange.Expensive;
             else
                 return PriceRange.Cheap;
         }
-        public static IEnumerable<object> GroupComicsByPrice(IEnumerable<Comic> catalog, IReadOnlyDictionary<int, decimal> prices)
+        public static IEnumerable<IGrouping<PriceRange, Comic>> GroupComicsByPrice(
+                              IEnumerable<Comic> comics, IReadOnlyDictionary<int, decimal> prices)
         {
-            var group =
-                from comic in catalog
+            IEnumerable<IGrouping<PriceRange, Comic>> grouped =
+                from comic in comics
                 orderby prices[comic.Issue]
-                group comic by CalculatePriceRange(comic) into grouped
-                select grouped;
-            return (IEnumerable<IGrouping<PriceRange, Comic>>)group;
+                group comic by CalculatePriceRange(comic, prices) into priceGroup
+                select priceGroup;
+            return grouped;
         }
-        public static IEnumerable<object> GetReviews(IEnumerable<Comic> catalog, IEnumerable<Review> reviews)
+        public static IEnumerable<string> GetReviews(IEnumerable<Comic> comics, IEnumerable<Review> reviews)
         {
-            var first =
-                from comic in catalog
+            var joined =
+                from comic in comics
                 orderby comic.Issue
                 join review in reviews
                 on comic.Issue equals review.Issue
                 select $"{review.Critic} rated #{comic.Issue} '{comic.Name}' {review.Score:0.00}";
-            return first;
+            return joined;
         }
 
     }
