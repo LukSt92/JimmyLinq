@@ -14,18 +14,24 @@ namespace JimmyLinq
             while (!done)
             {
                 Console.WriteLine("\nPress G to group comics by price, R to get reviews, any other key to quit\n");
-                switch (Console.ReadKey(true).KeyChar.ToString().ToUpper())
+                //switch (Console.ReadKey(true).KeyChar.ToString().ToUpper())
+                //{
+                //    case "G":
+                //        done = GroupComicsByPrice();
+                //        break;
+                //    case "R":
+                //        done = GetReviews();
+                //        break;
+                //    default:
+                //        done = true;
+                //        break;
+                //}
+                done = Console.ReadKey(true).KeyChar.ToString().ToUpper() switch
                 {
-                    case "G":
-                        done = GroupComicsByPrice();
-                        break;
-                    case "R":
-                        done = GetReviews();
-                        break;
-                    default:
-                        done = true;
-                        break;
-                }
+                    "G" => GroupComicsByPrice(),
+                    "R" => GetReviews(),
+                    _ => true
+                };
             }
         }
         private static bool GroupComicsByPrice()
